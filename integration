@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 // Enable error reporting
 error_reporting(E_ALL);
@@ -17,7 +17,7 @@ $app->post('/helpwise-webhook', function ($request, $response) {
 
     // Authenticate with Infusionsoft API
     $infusionsoftApiUrl = 'https://api.infusionsoft.com/crm/rest/v1'; // Adjust based on Infusionsoft API
-    $infusionsoftApiKey = 'KeapAK-1f2bc59b49ff4f9c31195cc1fafdf6052a89671152efe11970';
+    $infusionsoftApiKey = 'Keap API Key';
     $headers = [
         'Authorization: Bearer ' . $infusionsoftApiKey,
     ];
