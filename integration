@@ -1,0 +1,57 @@
+<?php
+
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Set the error log file
+ini_set('error_log', '/home/purifyyourgaze/public_html/helpwise/error.log');
+
+// Helpwise Webhook Endpoint
+$app->post('/helpwise-webhook', function ($request, $response) {
+    // Assuming you are using a framework like Slim
+    $data = $request->getParsedBody(); // Adjust this based on the framework used
+
+    // Extract email from Helpwise ticket
+    $email = $data['email']; // Adjust this based on Helpwise webhook payload
+
+    // Authenticate with Infusionsoft API
+    $infusionsoftApiUrl = 'https://api.infusionsoft.com/crm/rest/v1'; // Adjust based on Infusionsoft API
+    $infusionsoftApiKey = 'KeapAK-1f2bc59b49ff4f9c31195cc1fafdf6052a89671152efe11970';
+    $headers = [
+        'Authorization: Bearer ' . $infusionsoftApiKey,
+    ];
+
+    // Query Infusionsoft for user information
+    $infusionsoftResponse = getInfusionsoftData($infusionsoftApiUrl, "/contacts?email={$email}", $headers);
+
+    // Retrieve Infusionsoft ID
+    $infusionsoftId = $infusionsoftResponse['id']; // Adjust based on Infusionsoft API response structure
+
+    // Construct custom URL with Infusionsoft ID
+    $customUrl = "https://xyz.com/?ID={$infusionsoftId}";
+
+    // Send data to custom workflow or application
+    // Implement your logic here
+
+    return $response->withStatus(200)->withJson(['message' => 'Integration successful']);
+});
+
+function getInfusionsoftData($baseUrl, $endpoint, $headers)
+{
+    $url = $baseUrl . $endpoint;
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        throw new Exception('Error accessing Infusionsoft API: ' . curl_error($ch));
+    }
+
+    curl_close($ch);
+
+    return json_decode($response, true);
+}
